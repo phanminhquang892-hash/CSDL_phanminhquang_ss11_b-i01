@@ -1,40 +1,27 @@
-create database b1;
-use b1;
+/*
+Phần A
+CALL CancelAppointment(1);
+Giải thích:
+Stored Procedure hiện tại không kiểm tra trạng thái status trước khi cập nhật. 
+Vì vậy, dù lịch khám đã là Completed vẫn bị cập nhật thành Cancelled, dẫn đến sai lệch dữ liệu.
 
-create table Patients (
-    Patient_ID int primary key,
-    Full_Name varchar(100),
-    Age int,
-    Room_Number int,
-    HIV_Status varchar(50),
-    Mental_Health_History varchar(255)
-);
+Phần B 
+Câu lệnh xóa thủ tục cũ
+DROP PROCEDURE IF EXISTS CancelAppointment;
 
--- chèn dữ liệu mẫu
-insert into Patients (Patient_ID, Full_Name, Age, Room_Number, HIV_Status, Mental_Health_History)
-values
-(1, 'Minh Thu', 30, 101, 'Negative', 'None'),
-(2, 'Hồng Vân', 40, 102, 'Positive', 'Anxiety'),
-(3, 'Cao Cường', 25, 103, 'Negative', 'None');
+*/
 
--- tạo view bảo mật
-create view Reception_Patient_View as
-select Patient_ID, Full_Name, Age, Room_Number
-from Patients
-where Age >= 0
-with check option;
 
--- kiểm tra view 
-select * from Reception_Patient_View;
+-- viết lại mã lệnh tạo mới
+DELIMITER //
 
--- update hợp lệ 
-update Reception_Patient_View
-set Age = 35
-where Patient_ID = 1;
+CREATE PROCEDURE CancelAppointment(IN p_appointment_id INT)
+BEGIN
+    UPDATE Appointments
+    SET status = 'Cancelled'
+    WHERE appointment_id = p_appointment_id
+      AND status = 'Pending';
+END //
 
--- update không hợp lệ 
-update Reception_Patient_View
-set Age = -5
-where Patient_ID = 2;
 
-drop database b1;
+DELIMITER ;
